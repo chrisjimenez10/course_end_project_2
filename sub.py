@@ -44,4 +44,3 @@ def init_db():
 
 # Clear screen function to clean terminal text
 clear_screen = lambda: os.system("clear" if os.name == "posix" else "cls")
-
