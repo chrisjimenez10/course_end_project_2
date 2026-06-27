@@ -89,7 +89,8 @@ def login_player(name):
         cursor.execute("INSERT INTO player_logins (player_id, login_utc, login_tz) VALUES (?,?,?)", (player_id, utc_now, local_tz))
 
         conn.commit()
-        print(player_id, player_name, last_played_utc, last_played_tz, score)
+        print(F"Welcome {player_name} - Your player id is: {player_id}")
+
 
 
 # Decorator function to cache local zone data after hitting the OS system (This helps avoid making mulitple system calls)
@@ -170,3 +171,8 @@ def delete_rows_reset_sequence(table):
         conn.commit()
 # delete_rows_reset_sequence()
 
+# login_player("Wendy Barajas")
+# login_player("Christopher Jimenez")
+# login_player("Mimi Jimenez")
+# login_player("Ortencia Avilez Espinoza")
+# player_login_history(1)
