@@ -4,6 +4,7 @@ import os
 from datetime import datetime, timezone # datetime module allows us to Create/Manipulate Date objects -> timezone.utc = We can acquire UTC (UTC = Coordinated Universal Time and each timezone can be UTC+ or UTC-, which is adding or subtracting from the UTC value -> We use UTC timestamps to sort for higher accuracy)
 from zoneinfo import ZoneInfo # zoneinfo module gives us access to the ZoneInfo(), which allows us to convert UTC to local
 import tzlocal # tzlocal is a dependency module (install from pip library) that detects machine timezone automatically -> tzlocal.get_localzone()
+from functools import lru_cache # Using lru_cache() function to "cache" data
 
 # Database file name
 DB_NAME: str = 'player_database.db'
@@ -90,19 +91,82 @@ def login_player(name):
         conn.commit()
         print(player_id, player_name, last_played_utc, last_played_tz, score)
 
-# login_player("Chris")
-# login_player("Wendy")
-# login_player("Michelle")
 
-def player_login_history(player_id):
+# Decorator function to cache local zone data after hitting the OS system (This helps avoid making mulitple system calls)
+@lru_cache(maxsize=1)
+def get_local_tz():
+    # 2. Here, we use the ZoneInfo() and tzlocal.get_localzone() to acquire local time zone in the format required to pass into astimezone() -> The data we get when we run tzlocal.get_localzone() is the area time zone the machine is located in like: "America/Chicago", "America/Los_Angeles", or "Asia/Tokyo"
+    return ZoneInfo(str(tzlocal.get_localzone()))
+
+
+def local_time_display(utc_dt: datetime):
+    """Function returns local time stamp for readability"""
+
+    # 1. Making sure incoming datetime "utc_dt" is UTC-aware
+    if utc_dt.tzinfo is None:
+        utc_dt = utc_dt.replace(tzinfo=timezone.utc)
+
+    # 3. Convert from UTC to local
+    local_time = utc_dt.astimezone(get_local_tz())
+
+    # 4. Here, we use the strftime() method to format the string and display the time how we want
+    formatted_time: str = local_time.strftime("%m/%d/%Y - %I:%M%p - %Z")
+   
+    return formatted_time
+
+
+def player_login_history(player_id, limit=None):
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         
+        # Here, we are implementing the feature of selecting HOW many login records to display via "limit" paramter and default to display ALL login history. Therefore, we are creating a "query" variable that will be used in the actual query command - 1.If no limit is indicated, default is None, therefore only the initialized "query" variable will be passed to the cursor.execute(), which DOES NOT have the LIMIT keyword + 2.If "limit" is not None, then we use the below coniditional logic to concatenate the query string with the LIMIT ?
+        query = '''
+            SELECT
+                players.id,
+                players.name,
+                players.score,
+                player_logins.login_utc,
+                player_logins.login_tz
+            FROM players JOIN player_logins
+            ON players.id = player_logins.player_id
+            WHERE players.id = ?
+            ORDER BY player_logins.login_utc DESC
+        '''
+        
+        # Here, we create the "params" list to insert into the query command as the variables to be placed inside the ? place holders. The variables we pass into the ? palce holders can be either inside a list or tuple -> We are dynamically adding a concatenated string, so we need to append to the list we initialized (using a list makes sense here). Now, that second list/tuple inside the execute() query command will have the SQL query string command + the tuple/list it needs to replace those ? place holders
+        params = [player_id]
+        if limit is not None:
+            # Here we concatenate the query (ensuring we add the SPACE in the begining here to separate from the last character in the original "query")
+            query += ''' LIMIT ?'''
+            params.append(limit)
 
-def delete_rows_reset_sequence():
+        # cursor.execute() RUNS the query + RETURNS cursor (holding all the data from the query) -> Therefore, we can simply do cursor.fetchall() without storing that into a variable (NOTE: Once we consume/fetch the cursor, the data is no longer there)
+        cursor.execute(query, params)
+        player_history = cursor.fetchall() # Storing result from cursor to conserve the data
+
+        formatted_history = []
+        for (id, name, score, utc_time, zone) in player_history:
+            # Here we convert the utc_time fetched from database (returns it as a string) into a datetime object that is UTC (the universal count, not with adding or subtracting based on local time zone -> instructed by +00:00)
+            if isinstance(utc_time, str):
+                utc_dt = datetime.fromisoformat(utc_time.replace('Z', '+00:00'))
+            else:
+                utc_dt = utc_time
+            # Here, we pass the fetched and converted UTC time stamp from database into our helper function to handle full display conversion
+            local_str = local_time_display(utc_dt)
+            # Here, we append the entire entry as a tuple using the variables we unpacked from the original fetched tuple into the new list we will display
+            formatted_history.append((id, name, score, local_str, zone))
+            
+        print(formatted_history)
+        return formatted_history
+
+
+def delete_rows_reset_sequence(table):
+    """This function resets table dynamically including all rows and reseting the auto-increment sequence"""
+
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM players")  
-        cursor.execute("DELETE FROM sqlite_sequence WHERE name='players'")  
+        cursor.execute(F"DELETE FROM {table}") # NOTE: We CANNOT use placeholders here because we are referencing a table name -> Place holders "?" are only for VALUES - Therefore, we can simply use an F string
+        cursor.execute(F"DELETE FROM sqlite_sequence WHERE name=?", (table,)) # Here, we CAN use a place holder because we are passing the table name as a VALUE
         conn.commit()
 # delete_rows_reset_sequence()
+
