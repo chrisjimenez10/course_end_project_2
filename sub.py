@@ -84,12 +84,28 @@ def login_player(name):
         ''', (name, utc_now, local_tz))
 
         # Tuple unpacking to access each column value and pass them into the query that stores player login history into the player_logins table
-        player_id, player_name, last_played_utc, last_played_tz, score = row.fetchone()
+        player_id, player_name, last_played_utc, last_played_tz, _ = row.fetchone()
 
         cursor.execute("INSERT INTO player_logins (player_id, login_utc, login_tz) VALUES (?,?,?)", (player_id, utc_now, local_tz))
 
+        cursor.execute("SELECT login_utc from player_logins WHERE player_id = ?", (player_id,))
+        list_of_logins = cursor.fetchall()
         conn.commit()
-        print(F"Welcome {player_name} - Your player id is: {player_id}")
+        
+        if isinstance(last_played_utc, str):
+            last_played_utc = datetime.fromisoformat(last_played_utc.replace('Z', '+00:00'))
+        else:
+            last_played_utc = last_played_utc
+        local_time = local_time_display(last_played_utc)
+  
+
+        if len(list_of_logins) > 1:
+            print(F"Welcome back {player_name} - Your player id is: {player_id}\nYou last played on {local_time} | {last_played_tz}")
+        else:
+            print(F"Welcome NEW player {player_name} - Your player id is: {player_id}")
+
+
+        return player_id
 
 
 
