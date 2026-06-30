@@ -104,7 +104,6 @@ def login_player(name):
         else:
             print(F"Welcome NEW player {player_name} - Your player id is: {player_id}")
 
-
         return player_id
 
 
@@ -175,20 +174,3 @@ def player_login_history(player_id, limit=None):
             
         print(formatted_history)
         return formatted_history
-
-
-def delete_rows_reset_sequence(table):
-    """This function resets table dynamically including all rows and reseting the auto-increment sequence"""
-
-    with sqlite3.connect(DB_NAME) as conn:
-        cursor = conn.cursor()
-        cursor.execute(F"DELETE FROM {table}") # NOTE: We CANNOT use placeholders here because we are referencing a table name -> Place holders "?" are only for VALUES - Therefore, we can simply use an F string
-        cursor.execute(F"DELETE FROM sqlite_sequence WHERE name=?", (table,)) # Here, we CAN use a place holder because we are passing the table name as a VALUE
-        conn.commit()
-# delete_rows_reset_sequence()
-
-# login_player("Wendy Barajas")
-# login_player("Christopher Jimenez")
-# login_player("Mimi Jimenez")
-# login_player("Ortencia Avilez Espinoza")
-# player_login_history(1)
