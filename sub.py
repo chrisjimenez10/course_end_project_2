@@ -1,6 +1,4 @@
 import sqlite3
-import pandas as pd
-import os
 from datetime import datetime, timezone # datetime module allows us to Create/Manipulate Date objects -> timezone.utc = We can acquire UTC (UTC = Coordinated Universal Time and each timezone can be UTC+ or UTC-, which is adding or subtracting from the UTC value -> We use UTC timestamps to sort for higher accuracy)
 from zoneinfo import ZoneInfo # zoneinfo module gives us access to the ZoneInfo(), which allows us to convert UTC to local
 import tzlocal # tzlocal is a dependency module (install from pip library) that detects machine timezone automatically -> tzlocal.get_localzone()
@@ -9,27 +7,6 @@ from functools import lru_cache # Using lru_cache() function to "cache" data
 # Database file name
 DB_NAME: str = 'player_database.db'
 # Initial Data - Here, we use a dicitonary to establish COLUMNS (Keys) + ROWS (Values)
-data = {
-    "Path": ["Dark Forest", "Dark Forest", "Mysterious Cave", "Mysterious Cave"],
-    "Choices": ["Follow River", "Climb Tree", "Light Torch", "Proceed in Darkness"],
-    "Points": [200, 75, 150, 50]
-}
-# CSV File name -> Will be located in same directory (using relative path)
-csv_file = 'game_choices.csv'
-
-# Clear screen function to clean terminal text
-clear_screen = lambda: os.system("clear" if os.name == "posix" else "cls")
-
-
-def init_csv():
-    # Here, we use the DataFrame() constructor and pass the "data" variable containing the dictionary as an argument to have Pandas create the Data Frame (Data Frame is a grid-like table with COLUMNS + ROWS)
-    df = pd.DataFrame(data)
-
-    # Here, we use use the "os" module and method path.exists() to check if the CSV file has been created already or not
-    if not os.path.exists(csv_file):
-        df.to_csv(csv_file, index=False)
-    else:
-        print(F"* {csv_file} * already exists, skipping export...")
 
 
 def init_db():
@@ -107,8 +84,15 @@ def login_player(name):
         return player_id
 
 
-
 # Decorator function to cache local zone data after hitting the OS system (This helps avoid making mulitple system calls)
+"""
+* lru = "Least Recently Used". It keeps a cache of function results keyed by the arguments you called it with.
+* maxsize=1 means -> Only remember the most recent call. If you call the function again with the same args, it SKIPS running the body and just returns the cached value.
+* Every subsequent call after the 1st function call of get_local_tz() ->
+1. lru_cache sees get_local_tz() was called with no arguments, and it already has a result cached for ()
+2. Skips tzlocal.get_localzone() entirely
+3. Returns the same ZoneInfo object instantly
+"""
 @lru_cache(maxsize=1)
 def get_local_tz():
     # 2. Here, we use the ZoneInfo() and tzlocal.get_localzone() to acquire local time zone in the format required to pass into astimezone() -> The data we get when we run tzlocal.get_localzone() is the area time zone the machine is located in like: "America/Chicago", "America/Los_Angeles", or "Asia/Tokyo"
@@ -174,3 +158,16 @@ def player_login_history(player_id, limit=None):
             
         print(formatted_history)
         return formatted_history
+
+
+def update_score(player_id, score):
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+        UPDATE players
+        SET score = ?
+        WHERE id = ?
+        ''', (score, player_id))
+        conn.commit()
+
+    pass
