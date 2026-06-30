@@ -154,11 +154,12 @@ def player_login_history(player_id, limit=None):
             # Here, we pass the fetched and converted UTC time stamp from database into our helper function to handle full display conversion
             local_str = local_time_display(utc_dt)
             # Here, we append the entire entry as a tuple using the variables we unpacked from the original fetched tuple into the new list we will display
-            formatted_history.append((id, name, score, local_str, zone))
-            
-        print(formatted_history)
-        return formatted_history
-
+            formatted_history.append((name, local_str, zone))
+        
+        print(F"Login History\n{"-"*14}")
+        for i, (name, time, area_zone) in enumerate(formatted_history):
+            print(F"{len(formatted_history) - i}. {name} | {time} | {area_zone}")
+    
 
 def update_score(player_id, score):
     with sqlite3.connect(DB_NAME) as conn:
@@ -170,4 +171,4 @@ def update_score(player_id, score):
         ''', (score, player_id))
         conn.commit()
 
-    pass
+    

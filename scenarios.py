@@ -42,17 +42,6 @@ def init_csv():
         print(F"* {csv_file} * already exists, skipping export...")
 
 
-def load_choices_for_path(path_name):
-    # Here, we will filter the CSV file by the "Path" column based on the passed path_name
-    path_df = ALL_PATHS[ALL_PATHS["Path"] == path_name]
-
-    # 1. zip() creates an iterable tuple of two elements from the two arguments passed (which should be a pandas Series [one dimensional labled array]) -> Here, it will be the values in the "Choices" column FIRST and then the values in the "Points" column SECOND. The values will be paired by POSITION as they appear in the individual Series
-
-    # Here, we use dict() which takes in an iterable with TWO items and converts into a dictionary -> 1.Item at index 0 (first item) is converted as the KEY 2.Item at index 1 (second item) is converted as the VALUE
-    filtered_dict = dict(zip(path_df["Choices"], path_df["Points"]))
-    return filtered_dict
-
-
 def add_paths(new_rows: list[dict[str, str | int]] | tuple[dict[str, str | int]]):
     """
     Function appends new paths as rows into existing CSV file
@@ -73,6 +62,17 @@ def add_paths(new_rows: list[dict[str, str | int]] | tuple[dict[str, str | int]]
         print(F"Created {csv_file} with {len(new_df)} rows")
 
 
+def load_choices_for_path(path_name):
+    # Here, we will filter the CSV file by the "Path" column based on the passed path_name
+    path_df = ALL_PATHS[ALL_PATHS["Path"] == path_name]
+
+    # 1. zip() creates an iterable tuple of two elements from the two arguments passed (which should be a pandas Series [one dimensional labled array]) -> Here, it will be the values in the "Choices" column FIRST and then the values in the "Points" column SECOND. The values will be paired by POSITION as they appear in the individual Series
+
+    # Here, we use dict() which takes in an iterable with TWO items and converts into a dictionary -> 1.Item at index 0 (first item) is converted as the KEY 2.Item at index 1 (second item) is converted as the VALUE
+    filtered_dict = dict(zip(path_df["Choices"], path_df["Points"]))
+    return filtered_dict
+
+
 def forest_path(path_name="Dark Forest"):
     """This function is executed when player selects "Dark Forest" path"""
     forest_dict = load_choices_for_path(path_name)
@@ -83,6 +83,8 @@ def cave_path(path_name="Mysterious Cave"):
     """This function is executed when player selects "Mysterious Cave" path"""
     cave_dict = load_choices_for_path(path_name)
     print(cave_dict)
+
+
 
 
 
