@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import time
 
 # Clear screen function to clean terminal text
 clear_screen = lambda: os.system("clear" if os.name == "posix" else "cls")
@@ -28,8 +29,6 @@ new_paths = [
     {"Path": "Mysterious Cave", "Choices": "Test Floor Stability", "Points": 180}
 ]
 
-# Load all paths from CSV file ONCE -> Increase performance by reading file only once and storing data
-ALL_PATHS = pd.read_csv(csv_file)
 
 def init_csv():
     # Here, we use the DataFrame() constructor and pass the "data" variable containing the dictionary as an argument to have Pandas create the Data Frame (Data Frame is a grid-like table with COLUMNS + ROWS)
@@ -41,6 +40,11 @@ def init_csv():
     else:
         print(F"* {csv_file} * already exists, skipping export...")
 
+
+# Here, we are executing init_csv() to create CSV file for FIRST time running the program -> We MUST run this function before reading the CSV file in ALL_PATHS to prevent an error that crashes program. When this module gets imported to main.py, it will run since it is NOT inside the [ if __name__ == "__main__": ]
+init_csv()
+# Load all paths from CSV file ONCE -> Increase performance by reading file only once and storing data
+ALL_PATHS = pd.read_csv(csv_file)
 
 def add_paths(new_rows: list[dict[str, str | int]] | tuple[dict[str, str | int]]):
     """
@@ -81,7 +85,7 @@ def forest_path(path_name="Dark Forest"):
         1: "Follow River",
         2: "Climb Tree",
         3: "Build Shelter",
-        4: "Track Animal",
+        4: "Track Animal Prints",
         5: "Forage for Berries",
         6: "Set Signal Fire"
     }
@@ -91,36 +95,74 @@ def forest_path(path_name="Dark Forest"):
         'Follow River': 200,
         'Climb Tree': 75,
         'Build Shelter': 125,
-        'Track Animal': 60,
+        'Track Animal Prints': 60,
         'Forage for Berries': 40,
         'Set Signal Fire': 175
     }
     '''
     while True:
-        print('''----- Select Choice -----
+        print(F'''----- Select Choice -----
+***** Moves: {moves} *****
 1.Follow River
 2.Climb Tree
 3.Build Shelter
-4.Track Animal
+4.Track Animal Prints
 5.Forage for Berries
 6.Set Signal Fire
         ''')
         try:
-            player_input = int(input())
+            player_input = int(input("Choice: "))
             match player_input:
                 case 1:
                     score += forest_dict[choices[1]]
-                    print("")
+                    print("Following the river, lookout for fresh water creatures...")
+                case 2:
+                    score += forest_dict[choices[2]]
+                    print("Climbing the tree, are you planning to scan the area from above - Not a bad idea...")
+                case 3:
+                    score += forest_dict[choices[3]]
+                    print("Building a shelter, are you sure building a shelter will help in finding the treasure?...")
+                case 4:
+                    score += forest_dict[choices[4]]
+                    print("Tracking the mysterious animal, maybe they actually know where they are headed...")
+                case 5:
+                    score += forest_dict[choices[5]]
+                    print("Foraging for berries, having fuel for this treacherous journey is a good idea...or is it?")
+                case 6:
+                    score += forest_dict[choices[6]]
+                    print("Setting a signal fire, this light will definitely help to see the way - but what will it attract?...")
+                case _:
+                    clear_screen()
+                    print("Invalid input, please type 1-6.")
+                    continue
         except ValueError:
+            clear_screen()
             print("Invalid input, please try again.")
             continue
+            
+        moves -= 1
+        if moves <= 0:
+            time.sleep(2)
+            clear_screen()
+            print("You have ran out of stamina and moves...")
+            return score
 
-
-    
+        input("\nPress ENTER to continue...")
+        clear_screen()
 
 
 def cave_path(path_name="Mysterious Cave"):
     """This function is executed when player selects "Mysterious Cave" path"""
+    score:int = 0
+    moves: int = 5
+    choices: dict[int, str] = {
+        1: "Light Torch",
+        2: "Proceed in Darkness",
+        3: "Check for Drafts",
+        4: "Mark Wall with Chalk",
+        5: "Listen for Echoes",
+        6: "Test Floor Stability"
+    }
     cave_dict = load_choices_for_path(path_name)
     '''
     cave_dict = {
@@ -132,13 +174,52 @@ def cave_path(path_name="Mysterious Cave"):
         'Test Floor Stability': 180
     }
     '''
-    print(cave_dict)
+    while True:
+        print(F'''----- Select Choice -----
+***** Moves: {moves} *****
+1.Light Torch
+2.Proceed in Darkness
+3.Check for Drafts
+4.Mark Wall with Chalk
+5.Listen for Echoes
+6.Test Floor Stability
+        ''')
+        try:
+            player_input = int(input("Choice: "))
+            match player_input:
+                case 1:
+                    score += cave_dict[choices[1]]
+                    print("Lighting the torch, the flames push back the darkness... but what else will see you now?")
+                case 2:
+                    score += cave_dict[choices[2]]
+                    print("Proceeding in darkness, your other senses sharpen... though you can't see what hunts by sound.")
+                case 3:
+                    score += cave_dict[choices[3]]
+                    print("Checking for drafts, a cold breeze hints at another passage... or something breathing.")
+                case 4:
+                    score += cave_dict[choices[4]]
+                    print("Marking the wall with chalk, leaving a trail back... just hope nothing follows it.")
+                case 5:
+                    score += cave_dict[choices[5]]
+                    print("Listening for echoes, the cave whispers back... was that water dripping, or footsteps?")
+                case 6:
+                    score += cave_dict[choices[6]]
+                    print("Testing floor stability, each step could be your last... but fortune favors the careful.")
+                case _:
+                    clear_screen()
+                    print("Invalid input, please type 1-6.")
+                    continue
+        except ValueError:
+            clear_screen()
+            print("Invalid input, please try again.")
+            continue
+            
+        moves -= 1
+        if moves <= 0:
+            time.sleep(2)
+            clear_screen()
+            print("You have ran out of stamina and moves...")
+            return score
 
-
-
-
-
-if __name__ == "__main__":
-    clear_screen()
-    forest_path()
-    cave_path()
+        input("\nPress ENTER to continue...")
+        clear_screen()

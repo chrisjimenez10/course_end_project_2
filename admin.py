@@ -1,5 +1,5 @@
 import sqlite3
-from sub import DB_NAME
+from db_logic import DB_NAME
 
 PLAYERS_TABLE = "players"
 PLAYER_LOGINS_TABLE = "player_logins"

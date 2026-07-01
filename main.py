@@ -1,4 +1,4 @@
-import sub
+import db_logic
 import scenarios
 
 MENU = '''
@@ -13,21 +13,24 @@ PATHS = {
 }
 
 def start_game():
+    db_logic.init_db()
+
     print("Welcome to the Jurassic Adventure!\nThere is a treasure awaiting, so make sure to choose wisely on the path you will take...")
     player_name = input("What is your name? ").lower()
     scenarios.clear_screen()
-    player_id = sub.login_player(player_name)
+    player_id = db_logic.login_player(player_name)
+    total_score = 0 # Total score to determine whether player found treasure or not
 
     # MENU Outer Loop
     while True:
         print(MENU)
         try:
-            player_input = int(input())
+            player_input = int(input("Choice: "))
             match player_input:
                 case 1: pass
                 case 2:
                     scenarios.clear_screen()
-                    sub.player_login_history(player_id=player_id)
+                    db_logic.player_login_history(player_id=player_id)
                     continue
                 case 3: return
                 case _:
@@ -47,10 +50,10 @@ def start_game():
                 player_path_selection = int(input())
                 match player_path_selection:
                     case 1:
-                        scenarios.forest_path()
+                        total_score = scenarios.forest_path()
                         break
                     case 2:
-                        scenarios.cave_path()
+                        total_score = scenarios.cave_path()
                         break
                     case _:
                         scenarios.clear_screen()
@@ -60,21 +63,16 @@ def start_game():
                 scenarios.clear_screen()
                 print("Invalid input, please try again.")
                 continue
-            break
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
+            
+        # print(F"Player Score: {total_score}")
+        # WIN CONDITION -> Using total score accumulated from decisions made to determine win/lose
+        if total_score >= 650:
+            print("You have escaped the Dark Forest and found the treasure! Congratulations!!!")
+        else:
+            print("You got lost in the Dark Forest and DID NOT find the treasure...better luck next time!")
+        db_logic.update_score(player_id=player_id, score=total_score)
+        continue
+            
 
 if __name__ == "__main__":
     start_game()

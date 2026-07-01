@@ -170,5 +170,3 @@ def update_score(player_id, score):
         WHERE id = ?
         ''', (score, player_id))
         conn.commit()
-
-    
