@@ -35,10 +35,10 @@ Standard library modules used: `sqlite3`, `datetime`, `zoneinfo`, `os`, `time`, 
 * git clone https://github.com/chrisjimenez10/course_end_project_2.git
 
 ### **2. Create Virtual Environment**
-* ```cd course_end_project_2```
-* ```python -m venv venv```
-* ```venv\Scripts\activate```
-* ```source venv/bin/activate```
+* >```cd course_end_project_2```
+* >```python -m venv venv```
+* >```venv\Scripts\activate```
+* >```source venv/bin/activate```
 
 ### **3. Install Dependencies**
 * pip install -r requirements.txt
