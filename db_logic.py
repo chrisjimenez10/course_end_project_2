@@ -61,7 +61,7 @@ def login_player(name):
         ''', (name, utc_now, local_tz))
 
         # Tuple unpacking to access each column value and pass them into the query that stores player login history into the player_logins table
-        player_id, player_name, last_played_utc, last_played_tz, _ = row.fetchone()
+        player_id, player_name, last_played_utc, last_played_tz, score = row.fetchone()
 
         cursor.execute("INSERT INTO player_logins (player_id, login_utc, login_tz) VALUES (?,?,?)", (player_id, utc_now, local_tz))
 
@@ -77,9 +77,9 @@ def login_player(name):
   
 
         if len(list_of_logins) > 1:
-            print(F"Welcome back {player_name} - Your player id is: {player_id}\nYou last played on {local_time} | {last_played_tz}")
+            print(F"Welcome back {player_name}\nHighest Score: {score}")
         else:
-            print(F"Welcome NEW player {player_name} - Your player id is: {player_id}")
+            print(F"Welcome NEW player {player_name}")
 
         return player_id
 
