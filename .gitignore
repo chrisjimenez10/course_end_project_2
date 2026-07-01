@@ -1,4 +1,4 @@
 venv/
 player_database.db
 __pycache__/
-*.csv
+game_choices.csv
