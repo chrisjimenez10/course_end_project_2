@@ -64,13 +64,12 @@ def start_game():
                 print("Invalid input, please try again.")
                 continue
             
-        # print(F"Player Score: {total_score}")
         # WIN CONDITION -> Using total score accumulated from decisions made to determine win/lose
         if total_score >= 650:
             print("You have escaped the Dark Forest and found the treasure! Congratulations!!!")
         else:
             print("You got lost in the Dark Forest and DID NOT find the treasure...better luck next time!")
-        db_logic.update_score(player_id=player_id, score=total_score)
+        db_logic.update_score(player_id=player_id, new_score=total_score)
         continue
             
 

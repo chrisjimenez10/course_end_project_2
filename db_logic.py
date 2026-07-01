@@ -161,12 +161,24 @@ def player_login_history(player_id, limit=None):
             print(F"{len(formatted_history) - i}. {name} | {time} | {area_zone}")
     
 
-def update_score(player_id, score):
+def update_score(player_id, new_score):
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
-        cursor.execute('''
-        UPDATE players
-        SET score = ?
+        row = cursor.execute('''
+        SELECT score
+        FROM players
         WHERE id = ?
-        ''', (score, player_id))
+        ''', (player_id,))
+        result = row.fetchone() # SELECT returns data -> It is a TUPLE of that single value we selected
+        old_score = result[0]
+        print(F"Old Score: {old_score}\nNew Score: {new_score}")
+
+        # Comparing old_score in data base against the new_score achieved by player -> We only store HIGHEST score
+        if old_score < new_score:
+            cursor.execute('''
+            UPDATE players
+            SET score = ?
+            WHERE id = ?
+            ''', (new_score, player_id))
+
         conn.commit()
