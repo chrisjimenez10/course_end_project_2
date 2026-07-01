@@ -36,7 +36,7 @@ Standard library modules used: `sqlite3`, `datetime`, `zoneinfo`, `os`, `time`, 
 
 ### **1. Clone the repository**
 >```
-> git clone `https://github.com/chrisjimenez10/course_end_project_2.git`
+> git clone https://github.com/chrisjimenez10/course_end_project_2.git
 >```
 
 ### **2. Create Virtual Environment**
@@ -46,9 +46,13 @@ Standard library modules used: `sqlite3`, `datetime`, `zoneinfo`, `os`, `time`, 
 > ```
 > python -m venv venv
 > ```
+
+> Windows
 > ```
 > venv\Scripts\activate
 > ```
+
+> macOS/Linux
 > ```
 > source venv/bin/activate
 > ```
