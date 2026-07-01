@@ -11,6 +11,7 @@ A text-based adventure game where you explore the Dark Forest or Mysterious Cave
 | **OS** | Windows / macOS / Linux | Tested on all three |
 
 > **Check your versions:**
+
 > macOS/Linux
 > ```
 > python3 --version
@@ -34,7 +35,9 @@ Standard library modules used: `sqlite3`, `datetime`, `zoneinfo`, `os`, `time`, 
 ## **Installation & Setup**
 
 ### **1. Clone the repository**
-* git clone `https://github.com/chrisjimenez10/course_end_project_2.git`
+>```
+> git clone `https://github.com/chrisjimenez10/course_end_project_2.git`
+>```
 
 ### **2. Create Virtual Environment**
 > ```
