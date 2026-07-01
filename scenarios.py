@@ -75,13 +75,63 @@ def load_choices_for_path(path_name):
 
 def forest_path(path_name="Dark Forest"):
     """This function is executed when player selects "Dark Forest" path"""
-    forest_dict = load_choices_for_path(path_name)
-    print(forest_dict)
+    score:int = 0
+    moves: int = 5
+    choices: dict[int, str] = {
+        1: "Follow River",
+        2: "Climb Tree",
+        3: "Build Shelter",
+        4: "Track Animal",
+        5: "Forage for Berries",
+        6: "Set Signal Fire"
+    }
+    forest_dict: dict[str, int] = load_choices_for_path(path_name)
+    '''
+    forest_dict = {
+        'Follow River': 200,
+        'Climb Tree': 75,
+        'Build Shelter': 125,
+        'Track Animal': 60,
+        'Forage for Berries': 40,
+        'Set Signal Fire': 175
+    }
+    '''
+    while True:
+        print('''----- Select Choice -----
+1.Follow River
+2.Climb Tree
+3.Build Shelter
+4.Track Animal
+5.Forage for Berries
+6.Set Signal Fire
+        ''')
+        try:
+            player_input = int(input())
+            match player_input:
+                case 1:
+                    score += forest_dict[choices[1]]
+                    print("")
+        except ValueError:
+            print("Invalid input, please try again.")
+            continue
+
+
+    
 
 
 def cave_path(path_name="Mysterious Cave"):
     """This function is executed when player selects "Mysterious Cave" path"""
     cave_dict = load_choices_for_path(path_name)
+    '''
+    cave_dict = {
+        'Light Torch': 150,
+        'Proceed in Darkness': 50,
+        'Check for Drafts': 90,
+        'Mark Wall with Chalk': 25,
+        'Listen for Echoes': 110,
+        'Test Floor Stability': 180
+    }
+    '''
     print(cave_dict)
 
 
